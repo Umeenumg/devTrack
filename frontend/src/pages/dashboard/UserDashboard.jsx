@@ -3,9 +3,9 @@ import Layout from '../../components/Layout';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 
-function UserDashboard() {
+export default function UserDashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({ total_tasks: 0, done: 0, inProgress: 0, todo: 0, total_projects: 0, progress: 0 });
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,21 +20,17 @@ function UserDashboard() {
         api.get('/tasks'),
         api.get('/projects'),
       ]);
-      setTasks(tasksRes.data);
+      const t = tasksRes.data;
+      const done = t.filter(x => x.status === 'done').length;
+      const inProgress = t.filter(x => x.status === 'in_progress').length;
+      const todo = t.filter(x => x.status === 'todo').length;
+      setTasks(t);
       setProjects(projectsRes.data);
-
-      const done = tasksRes.data.filter(t => t.status === 'done').length;
-      const inProgress = tasksRes.data.filter(t => t.status === 'in_progress').length;
-      const todo = tasksRes.data.filter(t => t.status === 'todo').length;
-      const progress = tasksRes.data.length > 0
-        ? Math.round((done / tasksRes.data.length) * 100)
-        : 0;
-
       setStats({
-        total_tasks: tasksRes.data.length,
+        total_tasks: t.length,
         done, inProgress, todo,
         total_projects: projectsRes.data.length,
-        progress,
+        progress: t.length > 0 ? Math.round((done / t.length) * 100) : 0,
       });
     } catch (err) {}
     setLoading(false);
@@ -42,89 +38,57 @@ function UserDashboard() {
 
   const getGreeting = () => {
     const h = new Date().getHours();
-    if (h < 12) return 'Good Morning';
-    if (h < 18) return 'Good Afternoon';
-    return 'Good Evening';
+    if (h < 12) return 'Good morning';
+    if (h < 18) return 'Good afternoon';
+    return 'Good evening';
   };
 
-  const priorityColor = (p) => {
-    if (p === 'high') return '#ef4444';
-    if (p === 'medium') return '#a3e635';
-    return '#555';
-  };
-
-  const statusColor = (s) => {
-    if (s === 'done') return '#a3e635';
-    if (s === 'in_progress') return '#fff';
-    return '#555';
-  };
-
-  if (loading) {
-    return (
-      <Layout title="Overview">
-        <div style={{ color: '#555', fontFamily: 'monospace', fontSize: '12px' }}>
-          // loading...
-        </div>
-      </Layout>
-    );
-  }
+  if (loading) return (
+    <Layout title="Overview">
+      <div style={{ color: '#4a4a4a', fontSize: '13px' }}>Loading...</div>
+    </Layout>
+  );
 
   return (
     <Layout title="Overview">
 
-      {/* Welcome card */}
+      {/* Welcome */}
       <div style={{
-        background: '#111',
-        border: '1px solid #1f1f1f',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '16px',
+        background: '#111', border: '1px solid #1e1e1e',
+        borderRadius: '12px', padding: '24px', marginBottom: '16px',
       }}>
-        <div style={{ fontSize: '11px', color: '#555', fontFamily: 'monospace', marginBottom: '8px' }}>
-          // {getGreeting()} —
+        <div style={{ fontSize: '12px', color: '#4a4a4a', marginBottom: '6px' }}>
+          {getGreeting()} —
         </div>
-        <div style={{ fontSize: '32px', fontWeight: '900', color: '#fff', letterSpacing: '-1px', marginBottom: '12px', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: '28px', fontWeight: '800', color: '#fff', letterSpacing: '-0.5px', marginBottom: '16px' }}>
           {user?.name?.split(' ')[0]}{' '}
-          <span style={{ color: '#a3e635' }}>{user?.name?.split(' ')[1] || ''}</span>
+          <span style={{ color: '#6366f1' }}>{user?.name?.split(' ')[1] || ''}</span>
         </div>
 
-        <div style={{ fontSize: '13px', color: '#555', marginBottom: '16px', fontFamily: 'monospace' }}>
-          You have{' '}
-          <span style={{ color: '#a3e635', fontWeight: '700' }}>{stats?.inProgress} tasks</span>
-          {' '}in progress and{' '}
-          <span style={{ color: '#fff', fontWeight: '700' }}>{stats?.todo} todo</span>.
-        </div>
-
-        {/* Progress bar */}
-        <div style={{ marginBottom: '16px' }}>
+        {/* Progress */}
+        <div style={{ marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-            <span style={{ fontSize: '10px', color: '#444', letterSpacing: '2px', textTransform: 'uppercase' }}>
-              Overall Progress
-            </span>
-            <span style={{ fontSize: '10px', color: '#a3e635', fontWeight: '700' }}>
-              {stats?.progress}%
-            </span>
+            <span style={{ fontSize: '11px', color: '#4a4a4a' }}>Overall progress</span>
+            <span style={{ fontSize: '11px', color: '#6366f1', fontWeight: '600' }}>{stats.progress}%</span>
           </div>
-          <div style={{ height: '3px', background: '#1a1a1a', borderRadius: '3px' }}>
+          <div style={{ height: '4px', background: '#1e1e1e', borderRadius: '4px' }}>
             <div style={{
-              height: '3px', borderRadius: '3px',
-              background: '#a3e635',
-              width: `${stats?.progress}%`,
-              transition: 'width 0.5s ease',
+              height: '4px', background: '#6366f1', borderRadius: '4px',
+              width: `${stats.progress}%`, transition: 'width 0.5s ease',
             }} />
           </div>
         </div>
 
-        {/* Quick stats */}
-        <div style={{ display: 'flex', gap: '24px' }}>
+        {/* Quick numbers */}
+        <div style={{ display: 'flex', gap: '32px' }}>
           {[
-            { label: 'Projects', value: stats?.total_projects },
-            { label: 'Open Tasks', value: stats?.todo + stats?.inProgress },
-            { label: 'Completed', value: stats?.done },
+            { label: 'Projects', value: stats.total_projects },
+            { label: 'Open tasks', value: stats.todo + stats.inProgress },
+            { label: 'Completed', value: stats.done },
           ].map(s => (
             <div key={s.label}>
-              <div style={{ fontSize: '20px', fontWeight: '800', color: '#fff' }}>{s.value}</div>
-              <div style={{ fontSize: '10px', color: '#444', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
+              <div style={{ fontSize: '22px', fontWeight: '800', color: '#fff' }}>{s.value}</div>
+              <div style={{ fontSize: '11px', color: '#4a4a4a', marginTop: '2px' }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -133,22 +97,18 @@ function UserDashboard() {
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
         {[
-          { label: 'Todo', value: stats?.todo, color: '#555' },
-          { label: 'In Progress', value: stats?.inProgress, color: '#fff' },
-          { label: 'Done', value: stats?.done, color: '#a3e635' },
+          { label: 'Todo', value: stats.todo, color: '#4a4a4a' },
+          { label: 'In Progress', value: stats.inProgress, color: '#fff' },
+          { label: 'Done', value: stats.done, color: '#6366f1' },
         ].map(card => (
           <div key={card.label} style={{
-            background: '#111',
-            border: '1px solid #1f1f1f',
-            borderRadius: '12px',
-            padding: '20px',
+            background: '#111', border: '1px solid #1e1e1e',
+            borderRadius: '12px', padding: '20px',
           }}>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: card.color, marginBottom: '4px' }}>
+            <div style={{ fontSize: '32px', fontWeight: '800', color: card.color, marginBottom: '4px' }}>
               {card.value}
             </div>
-            <div style={{ fontSize: '10px', color: '#444', textTransform: 'uppercase', letterSpacing: '2px' }}>
-              {card.label}
-            </div>
+            <div style={{ fontSize: '12px', color: '#4a4a4a' }}>{card.label}</div>
           </div>
         ))}
       </div>
@@ -156,39 +116,34 @@ function UserDashboard() {
       {/* Tasks + Projects */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
 
-        {/* My Tasks */}
-        <div style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: '12px', padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '700', color: '#fff', textTransform: 'uppercase', letterSpacing: '2px' }}>
-              My Tasks
-            </span>
-            <span style={{ fontSize: '10px', color: '#444' }}>{tasks.length} total</span>
+        {/* Tasks */}
+        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: '12px', padding: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>My Tasks</span>
+            <span style={{ fontSize: '11px', color: '#4a4a4a' }}>{tasks.length} total</span>
           </div>
-
           {tasks.length === 0 ? (
-            <div style={{ fontSize: '11px', color: '#444', fontFamily: 'monospace' }}>// no tasks yet</div>
+            <div style={{ fontSize: '12px', color: '#4a4a4a' }}>No tasks yet</div>
           ) : (
-            tasks.slice(0, 5).map(task => (
+            tasks.slice(0, 6).map(task => (
               <div key={task.id} style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '10px 0',
-                borderBottom: '1px solid #1a1a1a',
+                padding: '9px 0', borderBottom: '1px solid #1a1a1a',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{
-                    width: '6px', height: '6px', borderRadius: '50%',
-                    background: priorityColor(task.priority), flexShrink: 0,
+                    width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0,
+                    background: task.priority === 'high' ? '#ef4444' : task.priority === 'medium' ? '#6366f1' : '#4a4a4a',
                   }} />
-                  <span style={{ fontSize: '12px', color: statusColor(task.status) }}>
+                  <span style={{ fontSize: '13px', color: task.status === 'done' ? '#4a4a4a' : '#fff', textDecoration: task.status === 'done' ? 'line-through' : 'none' }}>
                     {task.title}
                   </span>
                 </div>
                 <span style={{
-                  fontSize: '9px', color: '#000', fontWeight: '700',
-                  background: task.status === 'done' ? '#a3e635' : task.status === 'in_progress' ? '#fff' : '#2a2a2a',
+                  fontSize: '10px', fontWeight: '500',
                   padding: '2px 8px', borderRadius: '4px',
-                  textTransform: 'uppercase', letterSpacing: '1px',
-                  color: task.status === 'todo' ? '#555' : '#000',
+                  background: task.status === 'done' ? 'rgba(99,102,241,0.15)' : task.status === 'in_progress' ? 'rgba(255,255,255,0.06)' : '#1a1a1a',
+                  color: task.status === 'done' ? '#6366f1' : task.status === 'in_progress' ? '#fff' : '#4a4a4a',
                 }}>
                   {task.status.replace('_', ' ')}
                 </span>
@@ -198,38 +153,29 @@ function UserDashboard() {
         </div>
 
         {/* Projects */}
-        <div style={{ background: '#111', border: '1px solid #1f1f1f', borderRadius: '12px', padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '700', color: '#fff', textTransform: 'uppercase', letterSpacing: '2px' }}>
-              Projects
-            </span>
-            <span style={{ fontSize: '10px', color: '#444' }}>{projects.length} total</span>
+        <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: '12px', padding: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>Projects</span>
+            <span style={{ fontSize: '11px', color: '#4a4a4a' }}>{projects.length} total</span>
           </div>
-
           {projects.length === 0 ? (
-            <div style={{ fontSize: '11px', color: '#444', fontFamily: 'monospace' }}>// no projects yet</div>
+            <div style={{ fontSize: '12px', color: '#4a4a4a' }}>No projects yet</div>
           ) : (
-            projects.slice(0, 4).map(project => (
-              <div key={project.id} style={{
-                padding: '10px 0',
-                borderBottom: '1px solid #1a1a1a',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '12px', color: '#fff', fontWeight: '500' }}>
-                    {project.title}
-                  </span>
+            projects.slice(0, 5).map(project => (
+              <div key={project.id} style={{ padding: '9px 0', borderBottom: '1px solid #1a1a1a' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '13px', color: '#fff', fontWeight: '500' }}>{project.title}</span>
                   <span style={{
-                    fontSize: '9px', fontWeight: '700',
-                    color: project.status === 'active' ? '#a3e635' : '#555',
-                    textTransform: 'uppercase', letterSpacing: '1px',
+                    fontSize: '10px', fontWeight: '500',
+                    color: project.status === 'active' ? '#6366f1' : '#4a4a4a',
                   }}>
                     {project.status}
                   </span>
                 </div>
                 <div style={{ height: '2px', background: '#1a1a1a', borderRadius: '2px' }}>
                   <div style={{
-                    height: '2px', background: '#a3e635', borderRadius: '2px',
-                    width: `${project.tasks_count > 0 ? Math.round((project.tasks_count / 10) * 100) : 0}%`,
+                    height: '2px', background: '#6366f1', borderRadius: '2px',
+                    width: project.status === 'completed' ? '100%' : project.status === 'active' ? '50%' : '20%',
                   }} />
                 </div>
               </div>
@@ -241,5 +187,3 @@ function UserDashboard() {
     </Layout>
   );
 }
-
-export default UserDashboard;

@@ -1,10 +1,26 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import api from '../api/axios';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (token) {
+      api.get('/me')
+        .then(res => setUser(res.data))
+        .catch(() => {
+          setToken(null);
+          localStorage.removeItem('token');
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
 
   const login = (userData, userToken) => {
     setUser(userData);
@@ -18,6 +34,12 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
   };
 
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: '#6366f1', fontFamily: 'monospace', fontSize: '13px' }}>// loading...</div>
+    </div>
+  );
+
   return (
     <AuthContext.Provider value={{ user, token, login, logout, setUser }}>
       {children}
@@ -28,11 +50,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-
-//createContext(): Crée un "conteneur global" pour les données
-//user:  Les infos de l'utilisateur connecté
-//token:  Le token JWT sauvegardé
-//login():  Sauvegarde user + token quand on se connecte
-//logout():  Supprime tout quand on se déconnecte
-//AuthProvider:  Entoure toute l'app pour que tout le monde accède aux données
-//useAuth():  Hook pour utiliser ces données dans n'importe quel composant

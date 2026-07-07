@@ -1,0 +1,1 @@
+export default function AdminTeams() { return <div>Admin Teams</div> }

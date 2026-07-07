@@ -6,15 +6,9 @@ import api from '../../api/axios';
 function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [remember, setRemember] = useState(false);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,122 +30,166 @@ function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{
+      minHeight: '100vh',
+      background: '#0a0a0a',
+      display: 'flex',
+      fontFamily: 'Inter, sans-serif',
+    }}>
 
-      <div style={{ width: '100%', maxWidth: '400px' }}>
+      {/* Left side — branding */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '48px',
+        borderRight: '1px solid #1e1e1e',
+      }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '32px', height: '32px',
+              background: '#6366f1',
+              borderRadius: '8px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ color: '#fff', fontSize: '16px', fontWeight: '800' }}>P</span>
+            </div>
+            <span style={{ color: '#fff', fontSize: '16px', fontWeight: '700' }}>ProjectFlow</span>
+          </div>
+        </div>
 
-        {/* Card */}
-        <div style={{ background: '#111111', border: '1px solid #222', borderRadius: '16px', overflow: 'hidden' }}>
+        <div>
+          <div style={{ fontSize: '11px', color: '#4a4a4a', fontFamily: 'monospace', marginBottom: '16px' }}>
+            // manage your projects
+          </div>
+          <div style={{ fontSize: '36px', fontWeight: '800', color: '#fff', lineHeight: '1.2', marginBottom: '16px' }}>
+            Ship faster.<br />
+            <span style={{ color: '#6366f1' }}>Stay aligned.</span>
+          </div>
+          <div style={{ fontSize: '14px', color: '#4a4a4a', lineHeight: '1.6' }}>
+            Project management powered by AI. <br />
+            Track tasks, manage teams, ship on time.
+          </div>
+        </div>
 
-          {/* Header */}
-          <div style={{ padding: '28px 32px 24px', borderBottom: '1px solid #1f1f1f' }}>
-            <div style={{ fontSize: '22px', fontWeight: '800', color: '#a3e635', letterSpacing: '-0.5px', marginBottom: '4px' }}>
-              Project Manager
+        <div style={{ fontSize: '11px', color: '#2a2a2a', fontFamily: 'monospace' }}>
+          // v2.0 — powered by Claude AI
+        </div>
+      </div>
+
+      {/* Right side — form */}
+      <div style={{
+        width: '480px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px',
+      }}>
+        <div style={{ width: '100%' }}>
+
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ fontSize: '22px', fontWeight: '800', color: '#fff', marginBottom: '6px' }}>
+              Welcome back
+            </div>
+            <div style={{ fontSize: '13px', color: '#4a4a4a' }}>
+              Sign in to your workspace
             </div>
           </div>
 
-          {/* Body */}
-          <div style={{ padding: '32px' }}>
-
-            <div style={{ fontSize: '20px', fontWeight: '700', color: '#fff', marginBottom: '4px' }}>
-              Sign In
+          {error && (
+            <div style={{
+              background: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.2)',
+              color: '#f87171', fontSize: '13px',
+              borderRadius: '10px', padding: '12px 16px',
+              marginBottom: '20px',
+            }}>
+              {error}
             </div>
+          )}
 
-            {/* Error */}
-            {error && (
-              <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', fontSize: '13px', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px' }}>
-                {error}
-              </div>
-            )}
+          <form onSubmit={handleSubmit}>
 
-            <form onSubmit={handleSubmit}>
-
-              {/* Email */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', letterSpacing: '2px', textTransform: 'uppercase', color: '#555', marginBottom: '8px' }}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="you@company.com"
-                  style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '10px', padding: '12px 16px', fontSize: '13px', color: '#ccc', fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => e.target.style.borderColor = '#a3e635'}
-                  onBlur={e => e.target.style.borderColor = '#2a2a2a'}
-                />
-              </div>
-
-              {/* Password */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', letterSpacing: '2px', textTransform: 'uppercase', color: '#555', marginBottom: '8px' }}>
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="••••••••"
-                  style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '10px', padding: '12px 16px', fontSize: '13px', color: '#ccc', fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => e.target.style.borderColor = '#a3e635'}
-                  onBlur={e => e.target.style.borderColor = '#2a2a2a'}
-                />
-              </div>
-
-              {/* Remember + Forgot */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#555', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={e => setRemember(e.target.checked)}
-                    style={{ width: '14px', height: '14px', accentColor: '#a3e635', cursor: 'pointer' }}
-                  />
-                  Remember me
-                </label>
-                <span style={{ fontSize: '12px', color: '#a3e635', cursor: 'pointer' }}>
-                  Forgot password?
-                </span>
-              </div>
-
-              {/* Button */}
-              <button
-                type="submit"
-                disabled={loading}
+            {/* Email */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block', fontSize: '12px', fontWeight: '500',
+                color: '#888', marginBottom: '8px',
+              }}>
+                Email address
+              </label>
+              <input
+                type="email"
+                required
+                placeholder="you@company.com"
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
                 style={{
-                  width: '100%',
-                  padding: '14px',
-                  background: loading ? '#5a7a1a' : '#a3e635',
-                  color: '#000',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  letterSpacing: '1px',
-                  textTransform: 'uppercase',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  marginBottom: '20px',
-                  fontFamily: 'Inter, sans-serif',
+                  width: '100%', background: '#111',
+                  border: '1px solid #1e1e1e', borderRadius: '10px',
+                  padding: '12px 16px', fontSize: '14px', color: '#fff',
+                  fontFamily: 'Inter, sans-serif', outline: 'none',
+                  boxSizing: 'border-box', transition: 'border-color 0.15s',
                 }}
-              >
-                {loading ? 'Signing in...' : 'Sign In →'}
-              </button>
-
-            </form>
-
-            {/* Footer */}
-            <div style={{ textAlign: 'center', fontSize: '12px', color: '#444' }}>
-              No account?{' '}
-              <Link to="/register" style={{ color: '#a3e635', fontWeight: '700', textDecoration: 'none' }}>
-                Create one →
-              </Link>
+                onFocus={e => e.target.style.borderColor = '#6366f1'}
+                onBlur={e => e.target.style.borderColor = '#1e1e1e'}
+              />
             </div>
 
-          </div>
+            {/* Password */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                display: 'block', fontSize: '12px', fontWeight: '500',
+                color: '#888', marginBottom: '8px',
+              }}>
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="••••••••"
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                style={{
+                  width: '100%', background: '#111',
+                  border: '1px solid #1e1e1e', borderRadius: '10px',
+                  padding: '12px 16px', fontSize: '14px', color: '#fff',
+                  fontFamily: 'Inter, sans-serif', outline: 'none',
+                  boxSizing: 'border-box', transition: 'border-color 0.15s',
+                }}
+                onFocus={e => e.target.style.borderColor = '#6366f1'}
+                onBlur={e => e.target.style.borderColor = '#1e1e1e'}
+              />
+            </div>
+
+            {/* Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%', padding: '13px',
+                background: loading ? '#3730a3' : '#6366f1',
+                border: 'none', borderRadius: '10px',
+                color: '#fff', fontSize: '14px', fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontFamily: 'Inter, sans-serif',
+                transition: 'background 0.15s',
+              }}
+            >
+              {loading ? 'Signing in...' : 'Sign in →'}
+            </button>
+
+          </form>
+
+          <p style={{ textAlign: 'center', fontSize: '13px', color: '#4a4a4a', marginTop: '24px' }}>
+            No account?{' '}
+            <Link to="/register" style={{ color: '#6366f1', textDecoration: 'none', fontWeight: '500' }}>
+              Create one →
+            </Link>
+          </p>
+
         </div>
       </div>
     </div>
