@@ -22,7 +22,13 @@ Route::middleware('auth:sanctum')->group(function () {
   // Auth
   Route::post('/logout', [AuthController::class, 'logout']);
   Route::get('/me',      [AuthController::class, 'me']);
+  // Profile
+  Route::put('/profile', [ProfileController::class, 'update']);
+  Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 
+  // Teams
+  Route::post('/teams', [TeamController::class, 'store']);
+  Route::delete('/teams/{id}', [TeamController::class, 'destroy']);
   // Projects
   Route::get('/projects',        [ProjectController::class, 'index']);
   Route::post('/projects',       [ProjectController::class, 'store']);
