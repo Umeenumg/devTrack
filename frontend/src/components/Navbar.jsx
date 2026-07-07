@@ -1,159 +1,158 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 
-const menuItems = [
-  { path: '/dashboard', label: 'Overview', icon: '⊞' },
-  { path: '/projects', label: 'Projects', icon: '◫' },
-  { path: '/tasks', label: 'My Tasks', icon: '✓' },
-  { path: '/notifications', label: 'Notifications', icon: '○' },
-  { path: '/profile', label: 'Profile', icon: '◇' },
-];
-
-const adminItems = [
-  { path: '/admin/dashboard', label: 'Admin Panel', icon: '⚡' },
-  { path: '/admin/users', label: 'Users', icon: '○' },
-  { path: '/admin/teams', label: 'Teams', icon: '◫' },
-];
-
-function Sidebar() {
-  const { user, logout } = useAuth();
+function Navbar({ title, onNewProject, onNewTask }) {
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [time, setTime] = useState(new Date());
+  const [notifications, setNotifications] = useState([]);
+  const [showNotif, setShowNotif] = useState(false);
 
-  const handleLogout = async () => {
-    try { await api.post('/logout'); } catch (err) {}
-    logout();
-    navigate('/login');
+  useEffect(() => {
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    api.get('/notifications')
+      .then(res => setNotifications(res.data.filter(n => !n.is_read)))
+      .catch(() => {});
+  }, []);
+
+  const markAllRead = async () => {
+    try {
+      await api.put('/notifications/read-all');
+      setNotifications([]);
+      setShowNotif(false);
+    } catch (err) {}
   };
 
   return (
     <div style={{
-      width: '220px', minHeight: '100vh',
-      background: '#111111',
-      borderRight: '1px solid #1e1e1e',
-      display: 'flex', flexDirection: 'column',
-      fontFamily: 'Inter, sans-serif',
-      position: 'fixed', top: 0, left: 0,
+      height: '52px', background: '#111111',
+      borderBottom: '1px solid #1e1e1e',
+      display: 'flex', alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 20px', fontFamily: 'Inter, sans-serif',
+      position: 'sticky', top: 0, zIndex: 10,
     }}>
 
-      {/* Logo */}
-      <div style={{ padding: '20px 16px', borderBottom: '1px solid #1e1e1e' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '28px', height: '28px', background: '#6366f1',
-            borderRadius: '7px', display: 'flex', alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <span style={{ color: '#fff', fontSize: '14px', fontWeight: '800' }}>P</span>
-          </div>
-          <span style={{ color: '#fff', fontSize: '14px', fontWeight: '700' }}>ProjectFlow</span>
+      {/* Left */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontSize: '12px', color: '#2a2a2a' }}>Workspace</span>
+        <span style={{ fontSize: '12px', color: '#2a2a2a' }}>/</span>
+        <span style={{ fontSize: '13px', fontWeight: '500', color: '#fff' }}>{title || 'Overview'}</span>
+        <div style={{
+          padding: '3px 8px', background: '#0f0f0f',
+          border: '1px solid #1e1e1e', borderRadius: '5px',
+          fontSize: '11px', color: '#4a4a4a', fontFamily: 'monospace',
+        }}>
+          {time.toLocaleTimeString('en-US', { hour12: false })}
         </div>
       </div>
 
-      {/* User info */}
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid #1e1e1e' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '30px', height: '30px', background: '#6366f1',
-            borderRadius: '8px', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontSize: '12px', fontWeight: '700', color: '#fff',
-            flexShrink: 0,
-          }}>
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '12px', fontWeight: '600', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {user?.name}
-            </div>
-            <div style={{ fontSize: '10px', color: '#4a4a4a', textTransform: 'capitalize' }}>
-              {user?.role}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Right */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: '8px' }}>
-
-        {/* Main */}
-        <div style={{ fontSize: '10px', fontWeight: '600', color: '#2a2a2a', letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 8px 4px' }}>
-          Workspace
-        </div>
-
-        {menuItems.map(item => (
-          <NavLink key={item.path} to={item.path}
-            style={({ isActive }) => ({
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '7px 8px', borderRadius: '7px', marginBottom: '1px',
-              textDecoration: 'none', fontSize: '13px',
-              color: isActive ? '#fff' : '#4a4a4a',
-              background: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
-              fontWeight: isActive ? '500' : '400',
-              transition: 'all 0.1s',
-            })}
-            onMouseEnter={e => { if (!e.currentTarget.className.includes('active')) e.currentTarget.style.color = '#888' }}
-            onMouseLeave={e => { if (!e.currentTarget.className.includes('active')) e.currentTarget.style.color = '#4a4a4a' }}
-          >
-            {({ isActive }) => (
-              <>
-                <span style={{ fontSize: '11px', color: isActive ? '#6366f1' : '#4a4a4a' }}>{item.icon}</span>
-                {item.label}
-                {isActive && <div style={{ marginLeft: 'auto', width: '4px', height: '4px', borderRadius: '50%', background: '#6366f1' }} />}
-              </>
-            )}
-          </NavLink>
-        ))}
-
-        {/* Admin */}
         {user?.role === 'admin' && (
           <>
-            <div style={{ fontSize: '10px', fontWeight: '600', color: '#2a2a2a', letterSpacing: '1.5px', textTransform: 'uppercase', padding: '16px 8px 4px' }}>
-              Admin
-            </div>
-            {adminItems.map(item => (
-              <NavLink key={item.path} to={item.path}
-                style={({ isActive }) => ({
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  padding: '7px 8px', borderRadius: '7px', marginBottom: '1px',
-                  textDecoration: 'none', fontSize: '13px',
-                  color: isActive ? '#fff' : '#4a4a4a',
-                  background: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
-                  fontWeight: isActive ? '500' : '400',
-                })}
-              >
-                {({ isActive }) => (
-                  <>
-                    <span style={{ fontSize: '11px', color: isActive ? '#6366f1' : '#4a4a4a' }}>{item.icon}</span>
-                    {item.label}
-                    {isActive && <div style={{ marginLeft: 'auto', width: '4px', height: '4px', borderRadius: '50%', background: '#6366f1' }} />}
-                  </>
-                )}
-              </NavLink>
-            ))}
+            <button onClick={onNewTask}
+              style={{
+                padding: '6px 12px', background: 'transparent',
+                border: '1px solid #1e1e1e', borderRadius: '6px',
+                color: '#888', fontSize: '12px', fontWeight: '500',
+                cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f1'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = '#1e1e1e'}
+            >
+              + Task
+            </button>
+            <button onClick={onNewProject}
+              style={{
+                padding: '6px 12px', background: '#6366f1',
+                border: 'none', borderRadius: '6px',
+                color: '#fff', fontSize: '12px', fontWeight: '600',
+                cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              + Project
+            </button>
           </>
         )}
-      </nav>
 
-      {/* Logout */}
-      <div style={{ padding: '12px 8px', borderTop: '1px solid #1e1e1e' }}>
-        <button
-          onClick={handleLogout}
-          style={{
-            width: '100%', padding: '8px', background: 'transparent',
-            border: '1px solid #1e1e1e', borderRadius: '7px',
-            color: '#4a4a4a', fontSize: '12px', cursor: 'pointer',
-            fontFamily: 'Inter, sans-serif', display: 'flex',
-            alignItems: 'center', gap: '8px', transition: 'all 0.1s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.color = '#fff'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e1e'; e.currentTarget.style.color = '#4a4a4a'; }}
-        >
-          ← Sign out
-        </button>
+        {/* Notifications */}
+        <div style={{ position: 'relative' }}>
+          <button onClick={() => setShowNotif(!showNotif)}
+            style={{
+              width: '32px', height: '32px', background: '#0f0f0f',
+              border: '1px solid #1e1e1e', borderRadius: '6px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', position: 'relative', fontSize: '14px',
+            }}
+          >
+            🔔
+            {notifications.length > 0 && (
+              <div style={{
+                position: 'absolute', top: '-3px', right: '-3px',
+                width: '14px', height: '14px', background: '#6366f1',
+                borderRadius: '50%', fontSize: '8px', fontWeight: '700',
+                color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {notifications.length}
+              </div>
+            )}
+          </button>
+
+          {showNotif && (
+            <div style={{
+              position: 'absolute', top: '40px', right: '0',
+              width: '280px', background: '#111',
+              border: '1px solid #1e1e1e', borderRadius: '10px',
+              overflow: 'hidden', zIndex: 100,
+              boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+            }}>
+              <div style={{ padding: '10px 14px', borderBottom: '1px solid #1e1e1e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#fff' }}>Notifications</span>
+                {notifications.length > 0 && (
+                  <button onClick={markAllRead} style={{ fontSize: '11px', color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer' }}>
+                    Mark all read
+                  </button>
+                )}
+              </div>
+              {notifications.length === 0 ? (
+                <div style={{ padding: '24px', textAlign: 'center', fontSize: '12px', color: '#4a4a4a' }}>
+                  No new notifications
+                </div>
+              ) : (
+                notifications.map(n => (
+                  <div key={n.id} style={{ padding: '10px 14px', borderBottom: '1px solid #1e1e1e' }}>
+                    <div style={{ fontSize: '12px', color: '#ccc' }}>{n.message}</div>
+                    <div style={{ fontSize: '10px', color: '#4a4a4a', marginTop: '3px' }}>
+                      {new Date(n.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Avatar */}
+        <div onClick={() => navigate('/profile')} style={{
+          width: '32px', height: '32px', background: '#6366f1',
+          borderRadius: '6px', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', fontSize: '12px', fontWeight: '700',
+          color: '#fff', cursor: 'pointer',
+        }}>
+          {user?.name?.charAt(0).toUpperCase()}
+        </div>
+
       </div>
-
     </div>
   );
 }
 
-export default Sidebar;
+export default Navbar;
