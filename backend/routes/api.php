@@ -7,6 +7,8 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TeamController;
 // ─────────────────────────────────────────
 // PUBLIC ROUTES — no token needed
 // ─────────────────────────────────────────
