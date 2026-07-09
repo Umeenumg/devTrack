@@ -15,6 +15,10 @@ import Profile from './pages/profile/Profile';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminTeams from './pages/admin/AdminTeams';
 import Notifications from './pages/notifications/Notifications';
+import AITaskGenerator from './pages/ai/AITaskGenerator';
+import AISprintPlanner from './pages/ai/AISprintPlanner';
+import AIBugDetector from './pages/ai/AIBugDetector';
+
 
 function App() {
   return (
@@ -34,6 +38,10 @@ function App() {
           <Route path="/tasks/:id" element={<PrivateRoute><TaskDetail /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
+
+          <Route path="/ai/tasks" element={<PrivateRoute><AITaskGenerator /></PrivateRoute>} />
+          <Route path="/ai/sprints" element={<PrivateRoute><AISprintPlanner /></PrivateRoute>} />
+          <Route path="/ai/bugs" element={<PrivateRoute><AIBugDetector /></PrivateRoute>} />
           {/* Admin only */}
           <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
