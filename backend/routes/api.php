@@ -54,6 +54,11 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::get('/notifications',            [NotificationController::class, 'index']);
   Route::put('/notifications/{id}/read',  [NotificationController::class, 'markRead']);
   Route::put('/notifications/read-all',   [NotificationController::class, 'markAll']);
+
+  // Teams
+  Route::get('/teams/{id}', [TeamController::class, 'show']);
+  Route::post('/teams/{id}/members', [TeamController::class, 'addMember']);
+  Route::delete('/teams/{id}/members', [TeamController::class, 'removeMember']);
 });
 // ─────────────────────────────────────────
 // ADMIN ROUTES
