@@ -6,6 +6,7 @@ const menuItems = [
   { path: '/dashboard', label: 'Overview', icon: '⊞' },
   { path: '/projects', label: 'Projects', icon: '◫' },
   { path: '/tasks', label: 'My Tasks', icon: '✓' },
+  { path: '/kanban', label: 'Kanban', icon: '▦' },
   { path: '/notifications', label: 'Notifications', icon: '○' },
   { path: '/profile', label: 'Profile', icon: '◇' },
 ];
@@ -33,7 +34,7 @@ function Sidebar() {
   };
 
   const NavItem = ({ item }) => (
-    <NavLink key={item.path} to={item.path}
+    <NavLink to={item.path}
       style={({ isActive }) => ({
         display: 'flex', alignItems: 'center', gap: '8px',
         padding: '7px 8px', borderRadius: '7px', marginBottom: '1px',
@@ -64,13 +65,12 @@ function Sidebar() {
 
   return (
     <div style={{
-      width: '220px', minHeight: '100vh',
+      width: '220px', height: '100vh',
       background: '#111111',
       borderRight: '1px solid #1e1e1e',
       display: 'flex', flexDirection: 'column',
       fontFamily: 'Inter, sans-serif',
       position: 'fixed', top: 0, left: 0,
-      overflowY: 'auto',
     }}>
 
       {/* Logo */}
@@ -107,14 +107,12 @@ function Sidebar() {
         </div>
       </div>
 
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: '8px' }}>
+      {/* Nav — scrollable */}
+      <nav style={{ flex: 1, padding: '8px', overflowY: 'auto' }}>
 
-        {/* Workspace */}
         <SectionLabel label="Workspace" top />
         {menuItems.map(item => <NavItem key={item.path} item={item} />)}
 
-        {/* Admin */}
         {user?.role === 'admin' && (
           <>
             <SectionLabel label="Admin" />
@@ -122,7 +120,6 @@ function Sidebar() {
           </>
         )}
 
-        {/* AI Features */}
         <SectionLabel label="AI Features" />
         {aiItems.map(item => <NavItem key={item.path} item={item} />)}
 
