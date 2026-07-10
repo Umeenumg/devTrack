@@ -18,7 +18,7 @@ import Notifications from './pages/notifications/Notifications';
 import AITaskGenerator from './pages/ai/AITaskGenerator';
 import AISprintPlanner from './pages/ai/AISprintPlanner';
 import AIBugDetector from './pages/ai/AIBugDetector';
-import KanbanBoard from './pages/kanban/KanbanBoard';
+
 
 
 function App() {
@@ -43,7 +43,6 @@ function App() {
           <Route path="/ai/tasks" element={<PrivateRoute><AITaskGenerator /></PrivateRoute>} />
           <Route path="/ai/sprints" element={<PrivateRoute><AISprintPlanner /></PrivateRoute>} />
           <Route path="/ai/bugs" element={<PrivateRoute><AIBugDetector /></PrivateRoute>} />
-          <Route path="/kanban" element={<PrivateRoute><KanbanBoard /></PrivateRoute>} />
           {/* Admin only */}
           <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
