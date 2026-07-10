@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
+import Analytics from '../../components/Analytics';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 
@@ -127,7 +128,7 @@ export default function UserDashboard() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '0', marginBottom: '16px', background: '#111', border: '1px solid #1e1e1e', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
-        {['overview', 'kanban', 'projects'].map(tab => (
+        {['overview', 'kanban', 'projects', 'analytics'].map(tab => (
           <button key={tab}
             onClick={() => setActiveTab(tab)}
             style={{
@@ -361,6 +362,9 @@ export default function UserDashboard() {
           )}
         </div>
       )}
+        {activeTab === 'analytics' && (
+     <Analytics tasks={tasks} projects={projects} />
+    )}
 
     </Layout>
   );
