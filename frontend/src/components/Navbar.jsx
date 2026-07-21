@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import SmartSearch from './SmartSearch';
 import api from '../api/axios';
 
 function Navbar({ title, onNewProject, onNewTask }) {
@@ -94,6 +95,7 @@ function Navbar({ title, onNewProject, onNewTask }) {
             }}
           >
             🔔
+
             {notifications.length > 0 && (
               <div style={{
                 position: 'absolute', top: '-3px', right: '-3px',
@@ -105,7 +107,7 @@ function Navbar({ title, onNewProject, onNewTask }) {
               </div>
             )}
           </button>
-
+           
           {showNotif && (
             <div style={{
               position: 'absolute', top: '40px', right: '0',
@@ -139,6 +141,9 @@ function Navbar({ title, onNewProject, onNewTask }) {
             </div>
           )}
         </div>
+
+        {/* SmartSearch */}
+        <SmartSearch />
 
         {/* Avatar */}
         <div onClick={() => navigate('/profile')} style={{
