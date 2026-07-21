@@ -6,7 +6,6 @@ const menuItems = [
   { path: '/dashboard', label: 'Overview', icon: '⊞' },
   { path: '/projects', label: 'Projects', icon: '◫' },
   { path: '/tasks', label: 'My Tasks', icon: '✓' },
-  { path: '/kanban', label: 'Kanban', icon: '▦' },
   { path: '/notifications', label: 'Notifications', icon: '○' },
   { path: '/profile', label: 'Profile', icon: '◇' },
 ];
